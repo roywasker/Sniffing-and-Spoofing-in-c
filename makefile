@@ -1,4 +1,4 @@
-all: Sniffer Spoffer #Gateway
+all: Sniffer Spoffer Gateway
 Sniffer: Sniffer.c
 	gcc Sniffer.c -o Sniffer -lpcap
 Spoffer: Spoffer.c
