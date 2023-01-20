@@ -157,7 +157,7 @@ void send_raw_ip_packet(struct ipheader* ip)
     ntohs(ip->iph_len) - the length of the data to be sent
     (struct sockaddr *)&dest_info - a pointer to the sockaddr struct that contains the address info
      */
-    int B  bytes = sendto(sock, ip, ntohs(ip->iph_len), 0, (struct sockaddr *)&dest_info, sizeof(dest_info));
+    int bytes = sendto(sock, ip, ntohs(ip->iph_len), 0, (struct sockaddr *)&dest_info, sizeof(dest_info));
     if (bytes > 0){
         printf("spoffer packet send successfully \n\n");
     }
