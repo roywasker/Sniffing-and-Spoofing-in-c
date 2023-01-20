@@ -183,7 +183,7 @@ void spoof_icmp()
     struct ipheader *ip = (struct ipheader *) buffer; // pointer of ipheader type to the start of the buffer
 
 
-    icmp->icmp_type = 8; // set ICMP Type: 8 is request, 0 is reply.
+    icmp->icmp_type = 0; // set ICMP Type: 8 is request, 0 is reply.
 
     /* Calculate the checksum in order to make sure that the packet has not been tampered with during transmission */
     icmp->icmp_chksum = 0;

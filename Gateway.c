@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define PORT 9998
+#define PORT 9950
 #define BUFFSIZE 1024
 
 int main(int argc, char *argv[]){

@@ -88,26 +88,22 @@ int main(){
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 
-    struct iphdr *iphdr = (struct iphdr*) (packet + sizeof(struct ethhdr));
+    struct ipheader *iphdr = (struct ipheader*) (packet + sizeof(struct ethhdr));
 
-    unsigned short iplen = iphdr->ihl*4;
+    unsigned short iplen = iphdr->iph_ihl*4;
 
     struct icmpheader *recvicmp = (struct icmpheader*) (packet + sizeof(struct ethhdr) + iplen );
 
     if (recvicmp->icmp_type == 8) { // 8 is icmp request
 
-        struct sockaddr_in source,dest;
-        memset(&source, 0, sizeof(source));
-        source.sin_addr.s_addr = iphdr->saddr;
-
-        memset(&dest, 0, sizeof(dest));
-        dest.sin_addr.s_addr = iphdr->daddr;
-        printf("sniff icmp request packet form %s to %s \n",inet_ntoa(source.sin_addr),inet_ntoa(dest.sin_addr));
-        printf("spoff icmp reply packet form %s to %s \n",inet_ntoa(dest.sin_addr),inet_ntoa(source.sin_addr));
+        printf("sniff icmp request packet form %s ",inet_ntoa(iphdr->iph_sourceip));
+        printf("to %s \n",inet_ntoa(iphdr->iph_destip));
+        printf("spoff icmp reply packet form %s ",inet_ntoa(iphdr->iph_destip));
+        printf("to %s \n",inet_ntoa(iphdr->iph_sourceip));
 
         char buffer[1500];
         memset(buffer, 0, 1500); // set the buffer array with values of 0
-
+        memcpy((char *)buffer, iphdr, ntohs(iphdr->iph_len));
         struct icmpheader *icmp = (struct icmpheader *) (buffer + sizeof(struct ipheader)); // pointer to an icmp header
         struct ipheader *ip = (struct ipheader *) buffer; // pointer of ipheader type to the start of the buffer
 
@@ -122,8 +118,8 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
         ip->iph_ver = 4; // IPV4
         ip->iph_ihl = 5; // internet header length
         ip->iph_ttl = 20; // Time to live
-        ip->iph_sourceip.s_addr = iphdr->daddr; // source ip
-        ip->iph_destip.s_addr = iphdr->saddr; // dest ip
+        ip->iph_sourceip.s_addr = inet_addr(inet_ntoa(iphdr->iph_destip));; // source ip
+        ip->iph_destip.s_addr = inet_addr(inet_ntoa(iphdr->iph_sourceip));; // dest ip
         ip->iph_protocol = IPPROTO_ICMP; // protocol type
         ip->iph_len = htons(sizeof(struct ipheader) +sizeof(struct icmpheader)); // total length of the ip header and icmp header in bytes
 
