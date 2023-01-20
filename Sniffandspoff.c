@@ -50,7 +50,7 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
 int main(){
 
     pcap_t *handle; // a pointer to pcap_t struct, used to handle with packet capture operations
-    char *devname = "enp0s3"; // name of the network interface device
+    char *devname = "br-bf32f5e33a48"; // name of the network interface device
     char error_buffer[PCAP_ERRBUF_SIZE]; // hold an error massage in the libpacp library if there is one, size is defined in pcap.h
     struct bpf_program bpf; // a pointer to a struct that contains information about specific BPF program
     char filter[] = "icmp"; // TCP filter type
