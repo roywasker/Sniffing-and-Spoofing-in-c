@@ -95,6 +95,16 @@ void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *pa
     struct icmpheader *recvicmp = (struct icmpheader*) (packet + sizeof(struct ethhdr) + iplen );
 
     if (recvicmp->icmp_type == 8) { // 8 is icmp request
+
+        struct sockaddr_in source,dest;
+        memset(&source, 0, sizeof(source));
+        source.sin_addr.s_addr = iphdr->saddr;
+
+        memset(&dest, 0, sizeof(dest));
+        dest.sin_addr.s_addr = iphdr->daddr;
+        printf("sniff icmp request packet form %s to %s \n",inet_ntoa(source.sin_addr),inet_ntoa(dest.sin_addr));
+        printf("spoff icmp reply packet form %s to %s \n",inet_ntoa(dest.sin_addr),inet_ntoa(source.sin_addr));
+
         char buffer[1500];
         memset(buffer, 0, 1500); // set the buffer array with values of 0
 
@@ -147,8 +157,10 @@ void send_raw_ip_packet(struct ipheader* ip)
     ntohs(ip->iph_len) - the length of the data to be sent
     (struct sockaddr *)&dest_info - a pointer to the sockaddr struct that contains the address info
      */
-    sendto(sock, ip, ntohs(ip->iph_len), 0, (struct sockaddr *)&dest_info, sizeof(dest_info));
-
+    int B  bytes = sendto(sock, ip, ntohs(ip->iph_len), 0, (struct sockaddr *)&dest_info, sizeof(dest_info));
+    if (bytes > 0){
+        printf("spoffer packet send successfully \n\n");
+    }
     close(sock); // close the socket
 }
 
