@@ -1,3 +1,8 @@
+#include <pcap.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <net/ethernet.h>
+#include <netinet/ip.h>
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
@@ -6,6 +11,7 @@
 #include <netinet/in_systm.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <netinet/ip_icmp.h>
 
 /* IP Header */
 struct ipheader
@@ -82,7 +88,38 @@ int main(){
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet){
 
+    struct iphdr *iphdr = (struct iphdr*) (packet + sizeof(struct ethhdr));
 
+    unsigned short iplen = iphdr->ihl*4;
+
+    struct icmpheader *recvicmp = (struct icmpheader*) (packet + sizeof(struct ethhdr) + iplen );
+
+    if (recvicmp->icmp_type == 8) { // 8 is icmp request
+        char buffer[1500];
+        memset(buffer, 0, 1500); // set the buffer array with values of 0
+
+        struct icmpheader *icmp = (struct icmpheader *) (buffer + sizeof(struct ipheader)); // pointer to an icmp header
+        struct ipheader *ip = (struct ipheader *) buffer; // pointer of ipheader type to the start of the buffer
+
+        icmp->icmp_type = 0; // set ICMP Type: 8 is request, 0 is reply.
+
+        /* Calculate the checksum in order to make sure that the packet has not been tampered with during transmission */
+        icmp->icmp_chksum = 0;
+        icmp->icmp_chksum = in_cksum((unsigned short *) icmp, sizeof(struct icmpheader));
+
+
+        /* fill in the details of the ipheader struct */
+        ip->iph_ver = 4; // IPV4
+        ip->iph_ihl = 5; // internet header length
+        ip->iph_ttl = 20; // Time to live
+        ip->iph_sourceip.s_addr = iphdr->daddr; // source ip
+        ip->iph_destip.s_addr = iphdr->saddr; // dest ip
+        ip->iph_protocol = IPPROTO_ICMP; // protocol type
+        ip->iph_len = htons(sizeof(struct ipheader) +sizeof(struct icmpheader)); // total length of the ip header and icmp header in bytes
+
+        /* sending the spoffed packet*/
+        send_raw_ip_packet(ip); // the method get the ipheader struct after the changing
+    }
 }
 
 
