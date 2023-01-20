@@ -1,8 +1,8 @@
-all: Sniffer Spoofer Gateway
+all: Sniffer Spoffer #Gateway
 Sniffer: Sniffer.c
 	gcc Sniffer.c -o Sniffer -lpcap
-Spoofer: Spoofer.c
-	gcc Spoofer.c -o Spoofer
+Spoffer: Spoffer.c
+	gcc Spoffer.c -o Spoffer
 Gateway: Gateway.c
 	gcc Gateway.c -o Gateway
 
