@@ -8,4 +8,4 @@ Gateway: Gateway.c
 Sniffandspoff: Sniffandspoff.c
 	gcc Sniffandspoff.c -o Sniffandspoff -lpcap
 clean:
-	rm -f *.o Sniffer Spoofer Gateway
+	rm -f *.o Sniffer Spooffer Gateway Sniffandspoff
